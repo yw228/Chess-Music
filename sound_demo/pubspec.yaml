@@ -1,0 +1,145 @@
+name: sound_demo
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.5 <4.0.0'
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  audioplayers: ^5.2.1
+  auto_size_text: ^3.0.0
+  just_audio: ^0.9.36
+  # provider: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^3.0.1
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  assets:
+    # - assets/
+    - assets/notes/A1.wav
+    - assets/notes/A2.wav
+    - assets/notes/A3.wav
+    - assets/notes/A4.wav
+    - assets/notes/A5.wav
+    - assets/notes/A6.wav
+    - assets/notes/A7.wav
+    - assets/notes/Ab1.wav
+    - assets/notes/Ab2.wav
+    - assets/notes/Ab3.wav
+    - assets/notes/Ab4.wav
+    - assets/notes/Ab5.wav
+    - assets/notes/Ab6.wav
+    - assets/notes/Ab7.wav
+    - assets/notes/B1.wav
+    - assets/notes/B2.wav
+    - assets/notes/B3.wav
+    - assets/notes/B4.wav
+    - assets/notes/B5.wav
+    - assets/notes/B6.wav
+    - assets/notes/B7.wav
+    - assets/notes/Bb1.wav
+    - assets/notes/Bb2.wav
+    - assets/notes/Bb3.wav
+    - assets/notes/Bb4.wav
+    - assets/notes/Bb5.wav
+    - assets/notes/Bb6.wav
+    - assets/notes/Bb7.wav
+    - assets/notes/C1.wav
+    - assets/notes/C2.wav
+    - assets/notes/C3.wav
+    - assets/notes/C4.wav
+    - assets/notes/C5.wav
+    - assets/notes/C6.wav
+    - assets/notes/C7.wav
+    - assets/notes/C8.wav
+    - assets/notes/D1.wav
+    - assets/notes/D2.wav
+    - assets/notes/D3.wav
+    - assets/notes/D4.wav
+    - assets/notes/D5.wav
+    - assets/notes/D6.wav
+    - assets/notes/D7.wav
+    - assets/notes/Db1.wav
+    - assets/notes/Db2.wav
+    - assets/notes/Db3.wav
+    - assets/notes/Db4.wav
+    - assets/notes/Db5.wav
+    - assets/notes/Db6.wav
+    - assets/notes/Db7.wav
+    - assets/notes/E1.wav
+    - assets/notes/E2.wav
+    - assets/notes/E3.wav
+    - assets/notes/E4.wav
+    - assets/notes/E5.wav
+    - assets/notes/E6.wav
+    - assets/notes/E7.wav
+    - assets/notes/Eb1.wav
+    - assets/notes/Eb2.wav
+    - assets/notes/Eb3.wav
+    - assets/notes/Eb4.wav
+    - assets/notes/Eb5.wav
+    - assets/notes/Eb6.wav
+    - assets/notes/Eb7.wav
+    - assets/notes/F1.wav
+    - assets/notes/F2.wav
+    - assets/notes/F3.wav
+    - assets/notes/F4.wav
+    - assets/notes/F5.wav
+    - assets/notes/F6.wav
+    - assets/notes/F7.wav
+    - assets/notes/G1.wav
+    - assets/notes/G2.wav
+    - assets/notes/G3.wav
+    - assets/notes/G4.wav
+    - assets/notes/G5.wav
+    - assets/notes/G6.wav
+    - assets/notes/G7.wav
+    - assets/notes/Gb1.wav
+    - assets/notes/Gb2.wav
+    - assets/notes/Gb3.wav
+    - assets/notes/Gb4.wav
+    - assets/notes/Gb5.wav
+    - assets/notes/Gb6.wav
