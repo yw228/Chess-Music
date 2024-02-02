@@ -23,7 +23,8 @@ class HomePage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              playChord('C3', 'E3', 'G3');
+              // playChord('C3', 'E3', 'G3');
+              playChord('C3.mp3', 'C3.mp3', 'C3.mp3');
             }, 
             child: const Text('Chord'),
           ),
@@ -33,7 +34,7 @@ class HomePage extends StatelessWidget {
             }, 
             child: const Text('Scale'),
           ),
-          const ChordPlayer(note1: 'C3', note2: 'E3', note3: 'G3'),
+          const ChordPlayer(note1: 'C3.mp3', note2: 'C3.mp3', note3: 'C3.mp3'),
           const VolumeSlider(),
         ],
       ),
@@ -73,9 +74,13 @@ void playChord(String note1, String note2, String note3) async {
   final player2 = AudioPlayer();
   final player3 = AudioPlayer();
 
-  await player1.play(AssetSource('notes/$note1.wav'));
-  await player2.play(AssetSource('notes/$note2.wav'));
-  await player3.play(AssetSource('notes/$note3.wav'));
+  // await player1.play(AssetSource('notes/$note1.wav'));
+  // await player2.play(AssetSource('notes/$note2.wav'));
+  // await player3.play(AssetSource('notes/$note3.wav'));
+
+  await player1.play(AssetSource('notes/$note1'));
+  await player2.play(AssetSource('notes/$note2'));
+  await player3.play(AssetSource('notes/$note3'));
 
   Timer(const Duration(seconds: 4), () {
     player1.stop();
@@ -118,7 +123,8 @@ void playScale(String note1, String note2, String note3, String note4, String no
 void playNote(String note) {
   log("playing note $note");
   final player = AudioPlayer();
-  player.play(AssetSource('notes/$note.wav'));
+  // player.play(AssetSource('notes/$note.wav'));
+  player.play(AssetSource('notes/$note'));
   Timer(const Duration(seconds: 4), () {
     // player.stop();
     player.dispose();
@@ -143,7 +149,8 @@ class ButtonGrid extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           child: ElevatedButton(
             onPressed: () {
-              playNote(label);
+              // playNote(label);
+              playNote('C3.mp3');
             },
             style: ElevatedButton.styleFrom(
               shape: const CircleBorder(),
@@ -188,9 +195,9 @@ class ChordPlayerState extends State<ChordPlayer> {
   }
 
   void preloadNotes() {
-    player1.setSource(AssetSource('notes/${widget.note1}.wav'));
-    player2.setSource(AssetSource('notes/${widget.note2}.wav'));
-    player3.setSource(AssetSource('notes/${widget.note3}.wav'));
+    player1.setSource(AssetSource('notes/${widget.note1}'));
+    player2.setSource(AssetSource('notes/${widget.note2}'));
+    player3.setSource(AssetSource('notes/${widget.note3}'));
   }
 
   void playChord() {
@@ -198,7 +205,7 @@ class ChordPlayerState extends State<ChordPlayer> {
     player2.resume();
     player3.resume();
 
-    Timer(const Duration(seconds: 4), () {
+    Timer(const Duration(seconds: 1), () {
       player1.stop();
       player2.stop();
       player3.stop();
