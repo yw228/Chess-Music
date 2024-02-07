@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_midi/flutter_midi.dart';
+// import 'package:flutter_midi/flutter_midi.dart';
+import 'package:piano/services/audio_player.dart';
+import 'package:piano/services/note_calculator.dart';
 import 'package:tonic/tonic.dart';
 
 void main() => runApp(MyApp());
@@ -13,11 +15,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   initState() {
-    FlutterMidi().unmute();
-    rootBundle.load("assets/sounds/Piano.SF2").then((sf2) {
-      FlutterMidi().prepare(sf2: sf2, name: "Piano.SF2");
-    });
     super.initState();
+    // AudioPlayerService.instance.loadAudio('B4');
   }
 
   double get keyWidth => 80 + (80 * _widthRatio);
@@ -96,7 +95,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildKey(int midi, bool accidental) {
-    final pitchName = Pitch.fromMidiNumber(midi).toString();
+    final pitchName = NoteCalculator.instance.midi2name(midi);
+    final pitchFileName = NoteCalculator.instance.midi2FileName(midi);
     final pianoKey = Stack(
       children: <Widget>[
         Semantics(
@@ -108,8 +108,8 @@ class _MyAppState extends State<MyApp> {
                 child: InkWell(
                   borderRadius: borderRadius as BorderRadius,
                   highlightColor: Colors.grey,
-                  onTap: () {},
-                  onTapDown: (_) => FlutterMidi().playMidiNote(midi: midi),
+                  // onTap: () {AudioPlayerService.instance.play('B4');},
+                  onTapDown: (_) => AudioPlayerService.instance.play(pitchFileName),
                 ))),
         Positioned(
             left: 0.0,
@@ -134,7 +134,7 @@ class _MyAppState extends State<MyApp> {
               shadowColor: Color(0x802196F3),
               child: pianoKey));
     }
-    return Container(
+    return Container( 
         width: keyWidth,
         child: pianoKey,
         margin: EdgeInsets.symmetric(horizontal: 2.0));
