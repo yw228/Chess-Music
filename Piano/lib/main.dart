@@ -8,6 +8,7 @@ import 'package:record/record.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:async';
 
 
 void main() => runApp(MyApp());
@@ -24,6 +25,9 @@ class _MyAppState extends State<MyApp> {
   bool _showLabels = true;
   bool _isRecording = false;
   final _audioRecorder = AudioRecorder();
+  Timer? _timer;
+  Duration _recordingDuration = Duration(); // Track the duration between current
+
 
 
   @override
@@ -32,6 +36,23 @@ class _MyAppState extends State<MyApp> {
     _requestPermission();
     // AudioPlayerService.instance.loadAudio('B4');
   }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Ensure the timer is canceled when the widget is disposed
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel(); // Cancel any existing timer
+    _recordingDuration = Duration(); // Reset the duration
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        _recordingDuration += Duration(seconds: 1); // Update the duration
+      });
+    });
+  }
+
 
   Future<void> _requestPermission() async {
     var status = await Permission.microphone.status;
@@ -44,13 +65,22 @@ class _MyAppState extends State<MyApp> {
     final directory = await getApplicationDocumentsDirectory(); // Get the app's documents directory
     final String fileName = 'my_recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
     final String filePath = '${directory.path}/$fileName';
-
+    _startTimer();
     await _audioRecorder.start(const RecordConfig() , path: filePath); // Start recording
     print('Recording started: $filePath');
 
     // Update your state to reflect that recording is in progress
     setState(() {
       _isRecording = true;
+    });
+  }
+
+  Future<void> stopRecording() async {
+    final directory = await getApplicationDocumentsDirectory();
+    // Your existing stop recording logic...
+    _timer?.cancel(); // Stop the timer when recording stops
+    setState(() {
+      _recordingDuration = Duration(); // Reset the duration
     });
   }
 
@@ -91,6 +121,22 @@ class _MyAppState extends State<MyApp> {
                   ]))),
           appBar: AppBar(title: Text("Piano APP"),
             actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {
+                  // Your settings button action here
+                },
+              ),
+              if (_isRecording) // only display during recording
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Center(
+                    child: Text(
+                      "${_recordingDuration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${_recordingDuration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
               IconButton(
                   icon: Icon(
                     _isRecording ? Icons.stop : Icons.fiber_manual_record,
@@ -176,7 +222,7 @@ class _MyAppState extends State<MyApp> {
         Positioned(
             left: 0.0,
             right: 0.0,
-            bottom: 20.0,
+            bottom: 100.0,
             child: _showLabels
                 ? Text(pitchName,
                 textAlign: TextAlign.center,
