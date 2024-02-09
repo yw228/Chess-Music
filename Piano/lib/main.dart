@@ -4,6 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:piano/services/audio_player.dart';
 import 'package:piano/services/note_calculator.dart';
 import 'package:tonic/tonic.dart';
+import 'package:record/record.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
 
 void main() => runApp(MyApp());
 
@@ -13,20 +18,52 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  @override
-  initState() {
-    super.initState();
-    // AudioPlayerService.instance.loadAudio('B4');
-  }
 
   double get keyWidth => 80 + (80 * _widthRatio);
   double _widthRatio = 0.0;
   bool _showLabels = true;
+  bool _isRecording = false;
+  final _audioRecorder = AudioRecorder();
+
+
+  @override
+  initState() {
+    super.initState();
+    _requestPermission();
+    // AudioPlayerService.instance.loadAudio('B4');
+  }
+
+  Future<void> _requestPermission() async {
+    var status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      await Permission.microphone.request();
+    }
+  }
+
+  Future<void> startRecording() async {
+    final directory = await getApplicationDocumentsDirectory(); // Get the app's documents directory
+    final String fileName = 'my_recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+    final String filePath = '${directory.path}/$fileName';
+
+    await _audioRecorder.start(const RecordConfig() , path: filePath); // Start recording
+    print('Recording started: $filePath');
+
+    // Update your state to reflect that recording is in progress
+    setState(() {
+      _isRecording = true;
+    });
+  }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'The Pocket Piano',
+      title: 'The Piano APP',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: Scaffold(
           drawer: Drawer(
@@ -38,7 +75,7 @@ class _MyAppState extends State<MyApp> {
                         activeColor: Colors.redAccent,
                         inactiveColor: Colors.white,
                         min: 0.0,
-                        max: 1.0,
+                        max: 0.5,
                         value: _widthRatio,
                         onChanged: (double value) =>
                             setState(() => _widthRatio = value)),
@@ -50,8 +87,33 @@ class _MyAppState extends State<MyApp> {
                             onChanged: (bool value) =>
                                 setState(() => _showLabels = value))),
                     Divider(),
+
                   ]))),
-          appBar: AppBar(title: Text("The Pocket Piano")),
+          appBar: AppBar(title: Text("Piano APP"),
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(
+                    _isRecording ? Icons.stop : Icons.fiber_manual_record,
+                    color: _isRecording ? Colors.red : Colors.red,),
+                  onPressed: () async {
+                    if (_isRecording) {
+                      // Stop recording
+                      //var recordingPath = await _audioRecorder.stop(); // Assuming stop() returns the path; adjust according to the actual API
+                      //print('Recording stopped and saved to: $recordingPath');
+                      // await _audioRecorder.stop();
+                    } else {
+                      // Start recording
+                      //await startRecording();
+                    }
+                    setState(() {
+                      _isRecording = !_isRecording;
+                      // Recording logic here
+                    });
+                  },
+              tooltip: _isRecording ? 'Stop Recording' : 'Start Recording',
+              ),
+            ],
+          ),
           body: ListView.builder(
             itemCount: 7,
             controller: ScrollController(initialScrollOffset: 1500.0),
@@ -72,7 +134,7 @@ class _MyAppState extends State<MyApp> {
                   Positioned(
                       left: 0.0,
                       right: 0.0,
-                      bottom: 100,
+                      bottom: 150,
                       top: 0.0,
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

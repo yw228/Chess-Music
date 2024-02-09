@@ -13,8 +13,10 @@ dependencies:
     sdk: flutter
   tonic: ^0.2.4
   cupertino_icons: ^1.0.2
-  # flutter_midi: ^1.1.0
   just_audio: ^0.9.36
+  record: ^5.0.4
+  permission_handler: ^11.2.1
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:
