@@ -3,12 +3,15 @@ import 'package:flutter/services.dart';
 // import 'package:flutter_midi/flutter_midi.dart';
 import 'package:piano/services/audio_player.dart';
 import 'package:piano/services/note_calculator.dart';
+import 'package:piano/services/sequence_player.dart';
 import 'package:tonic/tonic.dart';
+import 'sequenceStrings.dart';
 import 'package:record/record.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:async';
+
 
 
 void main() => runApp(MyApp());
@@ -118,6 +121,8 @@ class _MyAppState extends State<MyApp> {
                                 setState(() => _showLabels = value))),
                     Divider(),
 
+                    // ElevatedButton(onPressed: SequencePlayer.instance.play(""), child: child )
+
                   ]))),
           appBar: AppBar(title: Text("Piano APP"),
             actions: <Widget>[
@@ -217,7 +222,8 @@ class _MyAppState extends State<MyApp> {
                   borderRadius: borderRadius as BorderRadius,
                   highlightColor: Colors.grey,
                   // onTap: () {AudioPlayerService.instance.play('B4');},
-                  onTapDown: (_) => AudioPlayerService.instance.play(pitchFileName),
+                  // onTapDown: (_) => AudioPlayerService.instance.play(pitchFileName),
+                  onTapDown: (_) => SequencePlayer.instance.load(SequenceStrings.sequence1),
                 ))),
         Positioned(
             left: 0.0,
