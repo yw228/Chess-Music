@@ -1,52 +1,50 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:piano/services/audio_player.dart';
 
-// Difficult to generate with piano input
-// Difficult to alter
-// Difficult to pause and replay mid-sequence
-
 class SequencePlayer {
   SequencePlayer._();
   AudioPlayer audioPlayer = AudioPlayer();
 
   static SequencePlayer get instance => SequencePlayer._();
 
-  List<Set<String>> noteList = [];
-  List<int> durationList = [];
+  List<Set<String>> noteSetList = []; // List storing sets of notes that are played together
+  List<int> durationList = []; // List storing the duration of the notes
 
   void load(String noteSequence) {
-    String temp = "";
-    bool toggle = true;
 
-    for (int i = 0; i < noteSequence.length; i++) {
-      if (noteSequence[i] == '/' || i == noteSequence.length - 1) {
-        if (noteSequence[i] != '/') {
-          temp += noteSequence[i];
-        }
+    // Splits the string by '/' and stores them in blocks.
+    List<String> blockList = noteSequence.split('/'); 
 
-        if (toggle) {
-          List<String> individualNoteList = temp.split('-');
-          Set<String> noteSet = individualNoteList.toSet();
-          noteList.add(noteSet);
-        } else {
-          durationList.add(int.parse(temp));
-        }
+    for (String block in blockList) {
+      // Splits the block by '=' to separate the notes and duration.
+      List<String> separatedBlock = block.split('=');
 
-        temp = "";
-        toggle = !toggle;
-      } else {
-        temp += noteSequence[i];
-      }
+      // Splits the notes by '-' to store individual notes in a set.
+      Set<String> noteSet = separatedBlock[0].split('-').toSet();
+
+      
+      noteSetList.add(noteSet); // Add individual note set to noteSetList
+      durationList.add(int.parse(separatedBlock[1])); // Add duration to durationList
     }
-    print("List One: $noteList");
+
+    // Prints the lists for testing.
+    print("List One: $noteSetList");
     print("List Two: $durationList");
+
+    // Added play() in load() just to have it play the sequence automatically and test.
+    // Playing the sequence will likely be called from a different widget.
     play();
   } 
 
+  
     
   void play() async {  
-    for (int i = 0; i < noteList.length; i++) {
-      Set<String> noteSet = noteList[i];
+    /** 
+     * Iterate over noteSetList and play all notes in the set for the 
+     * designated duration in durationList.
+     */
+    for (int i = 0; i < noteSetList.length; i++) {
+      Set<String> noteSet = noteSetList[i];
       for (String note in noteSet) {
         AudioPlayerService.instance.play(note);
       }
