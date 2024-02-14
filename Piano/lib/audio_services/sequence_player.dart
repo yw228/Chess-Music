@@ -1,19 +1,18 @@
-import 'package:just_audio/just_audio.dart';
-import 'package:piano/services/audio_player.dart';
+import 'dart:developer';
+
+import 'package:piano/audio_services/audio_player.dart';
 
 class SequencePlayer {
   SequencePlayer._();
-  AudioPlayer audioPlayer = AudioPlayer();
-
   static SequencePlayer get instance => SequencePlayer._();
 
   List<Set<String>> noteSetList = []; // List storing sets of notes that are played together
   List<int> durationList = []; // List storing the duration of the notes
 
-  void load(String noteSequence) {
+  void load(String sequenceString) {
 
     // Splits the string by '/' and stores them in blocks.
-    List<String> blockList = noteSequence.split('/'); 
+    List<String> blockList = sequenceString.split('/'); 
 
     for (String block in blockList) {
       // Splits the block by '=' to separate the notes and duration.
@@ -28,8 +27,8 @@ class SequencePlayer {
     }
 
     // Prints the lists for testing.
-    print("List One: $noteSetList");
-    print("List Two: $durationList");
+    log("List One: $noteSetList");
+    log("List Two: $durationList");
 
     // Added play() in load() just to have it play the sequence automatically and test.
     // Playing the sequence will likely be called from a different widget.

@@ -2,9 +2,9 @@ import 'package:just_audio/just_audio.dart';
 
 class AudioPlayerService {
   AudioPlayerService._();
-  AudioPlayer audioPlayer = AudioPlayer();
-
   static AudioPlayerService get instance => AudioPlayerService._();
+  
+  AudioPlayer audioPlayer = AudioPlayer();
 
   // void loadAudio(String note) => audioPlayer.setAsset("assets/audio/$note.mp3");
 
@@ -12,7 +12,7 @@ class AudioPlayerService {
 
   void play(String note) async {
     final player = AudioPlayer();
-    final duration = await player.setAsset('assets/audio/$note.mp3');                 // Schemes: (https: | file: | asset: )
+    await player.setAsset('assets/audio/$note.mp3');
     await player.play();
     player.stop();
   } 

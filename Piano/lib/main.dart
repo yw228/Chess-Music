@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 // import 'package:flutter_midi/flutter_midi.dart';
-import 'package:piano/services/audio_player.dart';
-import 'package:piano/services/note_calculator.dart';
-import 'package:piano/services/sequence_player.dart';
+import 'package:piano/audio_services/audio_player.dart';
+import 'package:piano/audio_services/note_calculator.dart';
+import 'package:piano/audio_services/sequence_player.dart';
 import 'package:tonic/tonic.dart';
-import 'services/sequenceStrings.dart';
+import 'audio_services/sequence_strings.dart';
 import 'package:record/record.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
