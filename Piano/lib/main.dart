@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 // import 'package:flutter_midi/flutter_midi.dart';
 import 'package:piano/services/audio_player.dart';
 import 'package:piano/services/note_calculator.dart';
+import 'package:piano/services/sequence_player.dart';
 import 'package:tonic/tonic.dart';
+import 'sequenceStrings.dart';
 
 void main() => runApp(MyApp());
 
@@ -50,6 +52,7 @@ class _MyAppState extends State<MyApp> {
                             onChanged: (bool value) =>
                                 setState(() => _showLabels = value))),
                     Divider(),
+                    // ElevatedButton(onPressed: SequencePlayer.instance.play(""), child: child )
                   ]))),
           appBar: AppBar(title: Text("The Pocket Piano")),
           body: ListView.builder(
@@ -109,7 +112,8 @@ class _MyAppState extends State<MyApp> {
                   borderRadius: borderRadius as BorderRadius,
                   highlightColor: Colors.grey,
                   // onTap: () {AudioPlayerService.instance.play('B4');},
-                  onTapDown: (_) => AudioPlayerService.instance.play(pitchFileName),
+                  // onTapDown: (_) => AudioPlayerService.instance.play(pitchFileName),
+                  onTapDown: (_) => SequencePlayer.instance.load(SequenceStrings.sequence1),
                 ))),
         Positioned(
             left: 0.0,
