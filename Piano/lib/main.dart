@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
               child: SafeArea(
                   child: ListView(children: <Widget>[
                     Container(height: 20.0),
-                    ListTile(title: Text("Change Width")),
+                    const ListTile(title: Text("Change Width")),
                     Slider(
                         activeColor: Colors.redAccent,
                         inactiveColor: Colors.white,
@@ -70,33 +70,29 @@ class _MyAppState extends State<MyApp> {
                         value: _widthRatio,
                         onChanged: (double value) =>
                             setState(() => _widthRatio = value)),
-                    Divider(),
-                    ListTile(title: Text("Change Height")), // New ListTile for height
+                    const Divider(),
+                    const ListTile(title: Text("Change Height")), // New ListTile for height
                     Slider(
                       activeColor: Colors.redAccent,
                       inactiveColor: Colors.white,
                       min: 0.0,
                       max: 1.0, // Assuming a similar range as width
                       value: _heightRatio,
-                      onChanged: (double value) {
-                        setState(() {
-                          _heightRatio = value;
-                        });
-                      },
-                    ),
-                    Divider(),
+                      onChanged: (double value) =>
+                        setState(() => _heightRatio = value)),
+                    const Divider(),
                     ListTile(
-                        title: Text("Show Labels"),
+                        title: const Text("Show Labels"),
                         trailing: Switch(
                             value: _showLabels,
                             onChanged: (bool value) =>
                                 setState(() => _showLabels = value))),
-                    Divider(),
+                    const Divider(),
                   ]))),
-          appBar: AppBar(title: Text("Piano APP"),
+          appBar: AppBar(title: const Text("Piano APP"),
             actions: <Widget>[
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: const Icon(Icons.settings),
                 onPressed: () {},
               ),
               if (_isRecording) // only display during recording
@@ -105,7 +101,7 @@ class _MyAppState extends State<MyApp> {
                   child: Center(
                     child: Text(
                       "${_recordingDuration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${_recordingDuration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
@@ -173,11 +169,24 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildKey(int midi, bool accidental) {
-    final double verticalPadding = 0.0 + (50.0 * _heightRatio);
+
     final pitchName = NoteCalculator.instance.midi2name(midi);
     final pitchFileName = NoteCalculator.instance.midi2FileName(midi);
 
-    final pianoKey = Stack(
+    // Define base heights for white and black keys
+    final double baseWhiteKeyHeight = 500.0; // Example base height for white keys
+    final double baseBlackKeyHeight = 400.0; // Example base height for black keys
+
+    // Calculate actual heights using _heightRatio
+    final double whiteKeyHeight = baseWhiteKeyHeight + (baseBlackKeyHeight * _heightRatio);
+    final double blackKeyHeight = baseBlackKeyHeight + (baseBlackKeyHeight * _heightRatio);
+
+    // Determine the key height based on whether it's an accidental or not
+    final double keyHeight = accidental ? blackKeyHeight : whiteKeyHeight;
+
+    final pianoKey = Container(
+      height: keyHeight,
+        child: Stack(
       children: <Widget>[
         Semantics(
             button: true,
@@ -200,29 +209,35 @@ class _MyAppState extends State<MyApp> {
                 ? Text(pitchName,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: !accidental ? Colors.black : Colors.white))
+                    color: !accidental ? Colors.black : Colors.white, fontSize: 16))
                 : Container()),
-      ],
+      ],),
     );
+
     if (accidental) {
-      return Container(
-          width: keyWidth,
-          margin: EdgeInsets.symmetric(horizontal: 2.0),
-          padding: EdgeInsets.symmetric(horizontal: keyWidth * .1),
-          child: Material(
-              elevation: 6.0,
-              borderRadius: borderRadius,
-              shadowColor: Color(0x802196F3),
-              child: pianoKey));
+      // Use Transform.translate to move the black keys up
+      return Transform.translate(
+        offset: Offset(0, -250), // Adjust the Y offset to move the key up
+        child: Container(
+            width: keyWidth,
+            margin: EdgeInsets.symmetric(horizontal: 2.0),
+            padding: EdgeInsets.symmetric(horizontal: keyWidth * .1),
+            child: Material(
+                elevation: 6.0,
+                borderRadius: borderRadius,
+                shadowColor: Color(0x802196F3),
+                child: pianoKey)),
+      );
     }
+
     return Container( 
         width: keyWidth,
-        padding: EdgeInsets.symmetric(vertical: verticalPadding),
         child: pianoKey,
         margin: EdgeInsets.symmetric(horizontal: 2.0)
     );
-
   }
+
+
 }
 
 
