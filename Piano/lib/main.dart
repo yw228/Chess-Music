@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_midi/flutter_midi.dart';
 import 'package:piano/audio_services/audio_player.dart';
@@ -13,6 +14,8 @@ import 'dart:async';
 
 
 
+
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -24,35 +27,18 @@ class _MyAppState extends State<MyApp> {
 
   double get keyWidth => 80 + (80 * _widthRatio);
   double _widthRatio = 0.0;
+  double _heightRatio = 0.0;
   bool _showLabels = true;
   bool _isRecording = false;
   final _audioRecorder = AudioRecorder();
   Timer? _timer;
   Duration _recordingDuration = Duration(); // Track the duration between current
 
-
-
   @override
   initState() {
     super.initState();
     _requestPermission();
     // AudioPlayerService.instance.loadAudio('B4');
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel(); // Ensure the timer is canceled when the widget is disposed
-    super.dispose();
-  }
-
-  void _startTimer() {
-    _timer?.cancel(); // Cancel any existing timer
-    _recordingDuration = Duration(); // Reset the duration
-    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
-      setState(() {
-        _recordingDuration += Duration(seconds: 1); // Update the duration
-      });
-    });
   }
 
 
@@ -62,33 +48,6 @@ class _MyAppState extends State<MyApp> {
       await Permission.microphone.request();
     }
   }
-
-  Future<void> startRecording() async {
-    final directory = await getApplicationDocumentsDirectory(); // Get the app's documents directory
-    final String fileName = 'my_recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
-    final String filePath = '${directory.path}/$fileName';
-    _startTimer();
-    await _audioRecorder.start(const RecordConfig() , path: filePath); // Start recording
-    print('Recording started: $filePath');
-
-    // Update your state to reflect that recording is in progress
-    setState(() {
-      _isRecording = true;
-    });
-  }
-
-  Future<void> stopRecording() async {
-    final directory = await getApplicationDocumentsDirectory();
-    // Your existing stop recording logic...
-    _timer?.cancel(); // Stop the timer when recording stops
-    setState(() {
-      _recordingDuration = Duration(); // Reset the duration
-    });
-  }
-
-
-
-
 
 
   @override
@@ -112,6 +71,20 @@ class _MyAppState extends State<MyApp> {
                         onChanged: (double value) =>
                             setState(() => _widthRatio = value)),
                     Divider(),
+                    ListTile(title: Text("Change Height")), // New ListTile for height
+                    Slider(
+                      activeColor: Colors.redAccent,
+                      inactiveColor: Colors.white,
+                      min: 0.0,
+                      max: 1.0, // Assuming a similar range as width
+                      value: _heightRatio,
+                      onChanged: (double value) {
+                        setState(() {
+                          _heightRatio = value;
+                        });
+                      },
+                    ),
+                    Divider(),
                     ListTile(
                         title: Text("Show Labels"),
                         trailing: Switch(
@@ -119,15 +92,12 @@ class _MyAppState extends State<MyApp> {
                             onChanged: (bool value) =>
                                 setState(() => _showLabels = value))),
                     Divider(),
-
                   ]))),
           appBar: AppBar(title: Text("Piano APP"),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.settings),
-                onPressed: () {
-                  // Your settings button action here
-                },
+                onPressed: () {},
               ),
               if (_isRecording) // only display during recording
                 Padding(
@@ -146,12 +116,10 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     if (_isRecording) {
                       // Stop recording
-                      //var recordingPath = await _audioRecorder.stop(); // Assuming stop() returns the path; adjust according to the actual API
-                      //print('Recording stopped and saved to: $recordingPath');
-                      // await _audioRecorder.stop();
+
                     } else {
                       // Start recording
-                      //await startRecording();
+
                     }
                     setState(() {
                       _isRecording = !_isRecording;
@@ -205,8 +173,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildKey(int midi, bool accidental) {
+    final double verticalPadding = 0.0 + (50.0 * _heightRatio);
     final pitchName = NoteCalculator.instance.midi2name(midi);
     final pitchFileName = NoteCalculator.instance.midi2FileName(midi);
+
     final pianoKey = Stack(
       children: <Widget>[
         Semantics(
@@ -219,8 +189,8 @@ class _MyAppState extends State<MyApp> {
                   borderRadius: borderRadius as BorderRadius,
                   highlightColor: Colors.grey,
                   // Change comment to play individual notes.
-                  // onTapDown: (_) => AudioPlayerService.instance.play(pitchFileName),
-                  onTapDown: (_) => SequencePlayer.instance.load(SequenceStrings.sequence1),
+                  onTapDown: (_) => AudioPlayerService.instance.play(pitchFileName),
+                  //onTapDown: (_) => SequencePlayer.instance.load(SequenceStrings.sequence1),
                 ))),
         Positioned(
             left: 0.0,
@@ -247,10 +217,15 @@ class _MyAppState extends State<MyApp> {
     }
     return Container( 
         width: keyWidth,
+        padding: EdgeInsets.symmetric(vertical: verticalPadding),
         child: pianoKey,
-        margin: EdgeInsets.symmetric(horizontal: 2.0));
+        margin: EdgeInsets.symmetric(horizontal: 2.0)
+    );
+
   }
 }
+
+
 
 const BorderRadiusGeometry borderRadius = BorderRadius.only(
     bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0));
