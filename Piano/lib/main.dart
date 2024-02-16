@@ -38,11 +38,9 @@ class _MyAppState extends State<MyApp> {
   @override
   initState() {
     super.initState();
-
   }
 
-
-  void _startCountdown() async {
+  void _startCountdown(bool permission) async {
     _countdownTime = 3; // Reset countdown time to 3
     Timer.periodic(Duration(seconds: 1), (timer) {
       if (_countdownTime > 0) {
@@ -51,15 +49,15 @@ class _MyAppState extends State<MyApp> {
         });
       } else {
         timer.cancel(); // Stop the timer
-        _startRecording(); // Start recording
+        _startRecording(permission); // Start recording
       }
     });
   }
 
 
-  Future<void> _startRecording() async {
+  Future<void> _startRecording(bool permission) async {
     // Ensure you have permission before starting
-    bool hasPermission = await _requestPermission();
+    bool hasPermission = permission;
     if (hasPermission) {
       // Start recording logic...
       print("Permission granted. Starting recording...");
@@ -70,7 +68,6 @@ class _MyAppState extends State<MyApp> {
         // Initialize or reset your recording duration timer here if needed
       });
       print("Recording started successfully.");
-
       _timer?.cancel(); // Cancel any existing timer
       _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
         setState(() {
@@ -93,7 +90,6 @@ class _MyAppState extends State<MyApp> {
     }
   }
 */
-
   Future<void> _stopRecording() async {
     String? path = await _audioRecorder.stop();
     await _audioRecorder.stop();
@@ -195,14 +191,14 @@ class _MyAppState extends State<MyApp> {
 
                     setState(() {
                       _isRecording = false;
-                      _countdownTime = 5;
+                      _countdownTime = 3;
                       // Reset countdown time after stopping recording
                     });
                     } else {
                       final bool hasPermission = await _requestPermission();
                       if (hasPermission)
                         {
-                          _startCountdown();
+                          _startCountdown(hasPermission);
                         }
                       else {
                         print("Microphone permission denied. Cannot start recording.");
@@ -304,7 +300,7 @@ class _MyAppState extends State<MyApp> {
     if (accidental) {
       // Use Transform.translate to move the black keys up
       return Transform.translate(
-        offset: Offset(0, -250), // Adjust the Y offset to move the key up
+        offset: Offset(0, -150), // will have to adjust it according to the device
         child: Container(
             width: keyWidth,
             margin: EdgeInsets.symmetric(horizontal: 2.0),
@@ -322,8 +318,6 @@ class _MyAppState extends State<MyApp> {
         margin: EdgeInsets.symmetric(horizontal: 2.0)
     );
   }
-
 }
-
 const BorderRadiusGeometry borderRadius = BorderRadius.only(
     bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0));

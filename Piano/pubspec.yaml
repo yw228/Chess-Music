@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   just_audio: ^0.9.36
   record: ^5.0.4
-  permission_handler: ^11.2.1
+  permission_handler: ^11.3.0
   path_provider: ^2.1.2
 
 dev_dependencies:
