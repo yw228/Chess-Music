@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 // import 'package:flutter_midi/flutter_midi.dart';
 import 'package:piano/audio_services/audio_player.dart';
 import 'package:piano/audio_services/note_calculator.dart';
@@ -11,9 +12,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:async';
-
-
-
 
 
 void main() => runApp(MyApp());
@@ -31,29 +29,97 @@ class _MyAppState extends State<MyApp> {
   bool _showLabels = true;
   bool _isRecording = false;
   final _audioRecorder = AudioRecorder();
+  final _audioPlayer = AudioPlayer();
   Timer? _timer;
-  Duration _recordingDuration = Duration(); // Track the duration between current
+  Duration _recordingDuration = Duration.zero;
+  int _countdownTime = 0;
+  String audioPath = 'assets/audio';
 
   @override
   initState() {
     super.initState();
-    _requestPermission();
-    // AudioPlayerService.instance.loadAudio('B4');
+
   }
 
 
-  Future<void> _requestPermission() async {
-    var status = await Permission.microphone.status;
-    if (!status.isGranted) {
-      await Permission.microphone.request();
+  void _startCountdown() async {
+    _countdownTime = 3; // Reset countdown time to 3
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_countdownTime > 0) {
+        setState(() {
+          _countdownTime--;
+        });
+      } else {
+        timer.cancel(); // Stop the timer
+        _startRecording(); // Start recording
+      }
+    });
+  }
+
+
+  Future<void> _startRecording() async {
+    // Ensure you have permission before starting
+    bool hasPermission = await _requestPermission();
+    if (hasPermission) {
+      // Start recording logic...
+      print("Permission granted. Starting recording...");
+      _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav), path: audioPath);
+      setState(() {
+        _isRecording = true;
+        _recordingDuration = Duration.zero;
+        // Initialize or reset your recording duration timer here if needed
+      });
+      print("Recording started successfully.");
+
+      _timer?.cancel(); // Cancel any existing timer
+      _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+        setState(() {
+          _recordingDuration += Duration(seconds: 1);
+        });
+      });
+    }
+    else {
+      print("Permission denied. Cannot start recording.");
     }
   }
+/*
+  Future<void> playRecording() async{
+    try{
+      Source url
+      await _audioPlayer.play()
+    }
+        catch(e) {
+      print("Error playing Recording : $e");
+    }
+  }
+*/
 
+  Future<void> _stopRecording() async {
+    String? path = await _audioRecorder.stop();
+    await _audioRecorder.stop();
+    // Cancel the timer to stop updating the recording duration
+    _timer?.cancel();
+    // Output the final duration of the recording to the console
+    print("Recording stopped. Final duration: ${_recordingDuration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${_recordingDuration.inSeconds.remainder(60).toString().padLeft(2, '0')}");
+    setState(() {
+      _isRecording = false;
+      audioPath = path!;
+    });
+  }
+
+  Future<bool> _requestPermission() async {
+    var status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      status = await Permission.microphone.request();
+      return status == PermissionStatus.granted;
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'The Piano APP',
+      title: 'Chess Music',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: Scaffold(
@@ -89,13 +155,24 @@ class _MyAppState extends State<MyApp> {
                                 setState(() => _showLabels = value))),
                     const Divider(),
                   ]))),
-          appBar: AppBar(title: const Text("Piano APP"),
+          appBar: AppBar(title: const Text("Chess Music"),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {},
               ),
-              if (_isRecording) // only display during recording
+              // Conditionally display countdown or recording duration
+              if (_countdownTime > 0) // Display countdown before recording starts
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Center(
+                    child: Text(
+                      "Starting in $_countdownTime",
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                )
+              else if (_isRecording) // Display during recording
                 Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: Center(
@@ -108,19 +185,29 @@ class _MyAppState extends State<MyApp> {
               IconButton(
                   icon: Icon(
                     _isRecording ? Icons.stop : Icons.fiber_manual_record,
-                    color: _isRecording ? Colors.red : Colors.red,),
+                    color: _isRecording ? Colors.red : Colors.red,
+                  ),
                   onPressed: () async {
                     if (_isRecording) {
                       // Stop recording
+                      _stopRecording();
+                    // await _audioRecorder.stop();
 
-                    } else {
-                      // Start recording
-
-                    }
                     setState(() {
-                      _isRecording = !_isRecording;
-                      // Recording logic here
+                      _isRecording = false;
+                      _countdownTime = 5;
+                      // Reset countdown time after stopping recording
                     });
+                    } else {
+                      final bool hasPermission = await _requestPermission();
+                      if (hasPermission)
+                        {
+                          _startCountdown();
+                        }
+                      else {
+                        print("Microphone permission denied. Cannot start recording.");
+                      }
+                    }
                   },
               tooltip: _isRecording ? 'Stop Recording' : 'Start Recording',
               ),
@@ -178,7 +265,7 @@ class _MyAppState extends State<MyApp> {
     final double baseBlackKeyHeight = 400.0; // Example base height for black keys
 
     // Calculate actual heights using _heightRatio
-    final double whiteKeyHeight = baseWhiteKeyHeight + (baseBlackKeyHeight * _heightRatio);
+    final double whiteKeyHeight = baseWhiteKeyHeight + (300 * _heightRatio);
     final double blackKeyHeight = baseBlackKeyHeight + (baseBlackKeyHeight * _heightRatio);
 
     // Determine the key height based on whether it's an accidental or not
@@ -229,7 +316,6 @@ class _MyAppState extends State<MyApp> {
                 child: pianoKey)),
       );
     }
-
     return Container( 
         width: keyWidth,
         child: pianoKey,
@@ -237,10 +323,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-
 }
-
-
 
 const BorderRadiusGeometry borderRadius = BorderRadius.only(
     bottomLeft: Radius.circular(10.0), bottomRight: Radius.circular(10.0));
